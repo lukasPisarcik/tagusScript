@@ -32,7 +32,7 @@ def extract_nth_bit_from_rgb(rgb_value, n):
     return [r_nth_bit, r1_nth_bit, r2_nth_bit, g_nth_bit, g1_nth_bit, g2_nth_bit, b_nth_bit, b1_nth_bit, b2_nth_bit]
 
 
-def diagonal_traverse_lsb(matrix):
+def diagonal_traverse(matrix):
     rows = len(matrix)
     cols = len(matrix[0])
 
