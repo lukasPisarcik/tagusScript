@@ -14,21 +14,22 @@ def load_rgb_matrix_from_file(file_path, img_width, img_height):
 
 
 def extract_nth_bit_from_rgb(rgb_value, n):
+    # print(rgb_value)
     r_nth_bit = (rgb_value[0] >> (n - 1)) & 1
     g_nth_bit = (rgb_value[1] >> (n - 1)) & 1
     b_nth_bit = (rgb_value[2] >> (n - 1)) & 1
     
     # next bit
-    # r1_nth_bit = (rgb_value[0] >> (n)) & 1
-    # g1_nth_bit = (rgb_value[1] >> (n)) & 1
-    # b1_nth_bit = (rgb_value[2] >> (n)) & 1
+    r1_nth_bit = (rgb_value[0] >> (n)) & 1
+    g1_nth_bit = (rgb_value[1] >> (n)) & 1
+    b1_nth_bit = (rgb_value[2] >> (n)) & 1
 
     # next bit
-    # r2_nth_bit = (rgb_value[0] >> (n + 1)) & 1
-    # g2_nth_bit = (rgb_value[1] >> (n + 1)) & 1
-    # b2_nth_bit = (rgb_value[2] >> (n + 1)) & 1
+    r2_nth_bit = (rgb_value[0] >> (n + 1)) & 1
+    g2_nth_bit = (rgb_value[1] >> (n + 1)) & 1
+    b2_nth_bit = (rgb_value[2] >> (n + 1)) & 1
 
-    return [r_nth_bit, g_nth_bit, b_nth_bit]
+    return [r_nth_bit, r1_nth_bit, r2_nth_bit, g_nth_bit, g1_nth_bit, g2_nth_bit, b_nth_bit, b1_nth_bit, b2_nth_bit]
 
 
 def diagonal_traverse_lsb(matrix):
@@ -59,6 +60,45 @@ def diagonal_traverse_lsb(matrix):
 
     return bits
 
+def diagonal_traverse_other_way(matrix):
+    rows = len(matrix)
+    cols = len(matrix[0])
+
+    bits = []
+
+    for start_row in range(rows):
+        row = start_row
+        col = 0
+        diagonal = []
+        while row >= 0 and col < cols:
+            lsb_values = extract_nth_bit_from_rgb(matrix[row][col], 1)
+            diagonal.extend(lsb_values) 
+            row -= 1
+            col += 1
+        
+        if start_row % 2 == 0:
+            bits.extend(diagonal)
+        else:
+            bits.extend(diagonal[::-1])
+
+    for start_col in range(1, cols):
+        row = rows - 1
+        col = start_col
+        diagonal = []
+
+        while row >= 0 and col < cols:
+            lsb_values = extract_nth_bit_from_rgb(matrix[row][col], 1)
+            diagonal.extend(lsb_values) 
+            row -= 1  
+            col += 1  
+        
+        if start_col % 2 == 0:
+            bits.extend(diagonal[::-1]) 
+        else:
+            bits.extend(diagonal)
+
+    return bits
+
 
 def bitstream_to_ascii(bitstream):
     ascii_string = ''
@@ -81,13 +121,13 @@ if __name__ == "__main__":
     # Image dimensions
     img_width = 2280
     img_height = 1282
-    # test_img_width = 3
-    # test_img_height = 3
+    test_img_width = 3
+    test_img_height = 3
 
     file_path = "input.txt" 
     rgb_matrix = load_rgb_matrix_from_file(file_path, img_width, img_height)
 
-    diagonal_lsb_values = diagonal_traverse_lsb(rgb_matrix)
+    diagonal_lsb_values = diagonal_traverse_other_way(rgb_matrix)
     ascii_string = bitstream_to_ascii(diagonal_lsb_values)
 
     print(ascii_string[:100])
